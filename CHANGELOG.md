@@ -5,6 +5,10 @@ All notable changes to this repository are listed here, newest first, in the for
 
 ## [Unreleased]
 
+### Added
+
+- CI badge in the README.
+
 ## [0.1.0] - 2026-11-08
 
 ### Added
