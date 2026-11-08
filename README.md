@@ -1,5 +1,7 @@
 # Engineering Practices
 
+[![CI](https://github.com/Vercroft/engineering-practices/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Vercroft/engineering-practices/actions/workflows/ci.yml)
+
 The rules we follow in every repository, written down so others can adopt them: git and pull requests, security,
 supply chain, testing, documentation and licensing, plus a page per language or tool. Maintained by the Vercroft
 maintainers.
