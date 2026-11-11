@@ -20,11 +20,13 @@ The Functional Source License was written for this case. Its authors describe it
 ## Decision
 
 We will license a public product that is sold as a hosted service under FSL-1.1-MIT, and add it to standard §7F.2 as a
-fourth code licence. It permits every purpose except a Competing Use, meaning a commercial product or service that
-substitutes for the Software, substitutes for another product or service we offer using the Software, or offers the same
-or substantially similar functionality. Its permitted purposes name internal use, non-commercial education and
-non-commercial research. Each version becomes available under MIT on the second anniversary of the date it was made
-available ([template](https://fsl.software/FSL-1.1-MIT.template.md)). Its SPDX identifier is `FSL-1.1-MIT`
+fourth code licence. It permits every purpose except a Competing Use, meaning making the Software available to others in
+a commercial product or service that substitutes for the Software, substitutes for any other product or service we offer
+using the Software that exists as of the date we make the Software available, or offers the same or substantially
+similar functionality as the Software. Its permitted purposes specifically include internal use and access,
+non-commercial education, non-commercial research, and professional services provided to a licensee using the Software.
+Each version becomes available under MIT on the second anniversary of the date it was made available
+([template](https://fsl.software/FSL-1.1-MIT.template.md)). Its SPDX identifier is `FSL-1.1-MIT`
 ([SPDX](https://spdx.org/licenses/FSL-1.1-MIT.html)). The server code of such a product is public on purpose, so §7F.1
 now makes that one exception; paid features and secret logic stay private.
 
