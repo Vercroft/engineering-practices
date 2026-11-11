@@ -8,6 +8,7 @@ All notable changes to this repository are listed here, newest first, in the for
 ### Added
 
 - CI badge in the README.
+- FSL-1.1-MIT as a fourth code licence in §7F, for public products sold as a hosted service.
 
 ## [0.1.0] - 2026-11-08
 
