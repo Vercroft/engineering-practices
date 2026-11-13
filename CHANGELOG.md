@@ -12,6 +12,7 @@ All notable changes to this repository are listed here, newest first, in the for
 - Two principles in §1: simplicity first (7) and surgical changes (8).
 - §3.6, measure before optimizing: a speed or memory change records before and after numbers from a measured baseline.
 - §3.7, production behaviour: timeouts, bounded retries with backoff, idempotent handling of repeated events, transactions, no swallowed failures.
+- §3.8, application layout: code grouped by feature, thin entry modules, tests mirror the feature folders.
 
 ### Changed
 
@@ -23,6 +24,8 @@ All notable changes to this repository are listed here, newest first, in the for
 - §2.5: state assumptions before building, and ask first when a request can be read two ways.
 - §6.14: keep each pull request reviewable, one piece of work or one batch of related changes; about 100 changed lines is a good size and 1000 usually too large.
 - §2.5: a report keeps apart what was verified, what is inferred and what is assumed.
+- The Python guide shows a feature layout; mirrored test folders get an empty `__init__.py` so mypy strict accepts
+  same-named test files (rule 1.6).
 
 ## [0.1.0] - 2026-11-08
 
