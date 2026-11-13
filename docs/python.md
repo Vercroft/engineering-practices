@@ -33,6 +33,10 @@ Practitioner evidence:
 
 - [HYN] Hynek Schlawack, [Testing & Packaging](https://hynek.me/articles/testing-packaging/) (updated 2021)
 - [UV12] [uv 0.12.0 release notes](https://github.com/astral-sh/uv/releases/tag/0.12.0) (2026-07-28)
+- [BLIST] James Bennett, [A Python 3.11 "gotcha"](https://www.b-list.org/weblog/2022/nov/08/python-311-gotcha/)
+  (2022-11-08): "I usually wait until the first bugfix release ... before seriously considering an upgrade"
+- [PYSPEED] Itamar Turner-Trauring, [When should you upgrade to Python 3.13?](https://pythonspeed.com/articles/upgrade-python-3.13)
+  (updated 2024-12-05): wait until "All your libraries" and "All the tools you rely on" explicitly support it
 - [SWC] Jack Diederich, [Stop Writing Classes](https://us.pycon.org/2012/schedule/presentation/352/), PyCon US 2012
 - [COOL] William Woodruff, [We should all be using dependency cooldowns](https://blog.yossarian.net/2025/11/21/We-should-all-be-using-dependency-cooldowns) (2025-11-21)
 - [PATH] discuss.python.org: [pathlib and os.path parity](https://discuss.python.org/t/pathlib-and-os-path-feature-parity-and-code-de-duplication/9239),
@@ -96,11 +100,12 @@ does not [PATH].
 
 ### 4. Python version and typing
 
-1. **Products run the newest stable CPython** [PYDL]. A new release (feature or bugfix) is adopted once it is at
-   least 7 days old (standard §7B.1) and the product's CI passes with every dependency installed from wheels
-   (`no-build = true`), using tool versions that are themselves at least 7 days old. Example, 2026-10-21: 3.15.0 passes
-   the sample project's CI with ruff 0.17.0, mypy 2.4.0 and pytest 9.1.1, and needs uv 0.13.0 or newer (uv 0.12.19
-   knows only 3.15.0rc2); 3.15.1 is adoptable from 2026-10-28.
+1. **Products run the newest stable CPython** [PYDL] (decision, 2026-11-13). A new feature release (3.16) is adopted from its
+   first bugfix release (3.16.1), once that is at least 7 days old (standard §7B.1) and the product's CI passes with
+   every dependency installed from wheels (`no-build = true`), using tool versions that are themselves at least 7 days
+   old. Later bugfix releases (3.16.2 and on) follow the 7-day rule alone. Why: practitioners wait for the first bugfix
+   release [BLIST], and until every library and tool they rely on supports the new release [PYSPEED]. Example: 3.15.0
+   was released on 2026-10-09 and 3.15.1 on 2026-10-21 [PYDL], so 3.15 was adoptable from 2026-10-28.
 2. **If one dependency is not ready** (no wheel for the new version, or its tests fail), the product stays on the
    previous version and records why: a comment beside `requires-python` naming the dependency and its upstream issue.
    The upgrade routine re-checks it.
