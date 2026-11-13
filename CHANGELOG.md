@@ -9,7 +9,7 @@ All notable changes to this repository are listed here, newest first, in the for
 
 - CI badge in the README.
 - FSL-1.1-MIT as a fourth code licence in §7F, for public products sold as a hosted service.
-- Two principles in §1: simplicity first (7) and surgical changes (8).
+- Two principles in §1: only what is required (7), which never cuts required work, and surgical changes (8).
 - §3.6, measure before optimizing: a speed or memory change records before and after numbers from a measured baseline.
 - §3.7, production behaviour: timeouts, bounded retries with backoff, idempotent handling of repeated events, transactions, no swallowed failures.
 - §3.8, application layout: code grouped by feature, thin entry modules, tests mirror the feature folders.
