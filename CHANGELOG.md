@@ -10,6 +10,8 @@ All notable changes to this repository are listed here, newest first, in the for
 - CI badge in the README.
 - FSL-1.1-MIT as a fourth code licence in §7F, for public products sold as a hosted service.
 - Two principles in §1: simplicity first (7) and surgical changes (8).
+- §3.6, measure before optimizing: a speed or memory change records before and after numbers from a measured baseline.
+- §3.7, production behaviour: timeouts, bounded retries with backoff, idempotent handling of repeated events, transactions, no swallowed failures.
 
 ### Changed
 
@@ -19,6 +21,7 @@ All notable changes to this repository are listed here, newest first, in the for
 - The Python guide adopts a new feature release from its first bugfix release, once that is 7 days old (rule 4.1).
 - §2.5: state assumptions before building, and ask first when a request can be read two ways.
 - §6.14: keep each pull request reviewable, one piece of work or one batch of related changes; about 100 changed lines is a good size and 1000 usually too large.
+- §2.5: a report keeps apart what was verified, what is inferred and what is assumed.
 
 ## [0.1.0] - 2026-11-08
 
