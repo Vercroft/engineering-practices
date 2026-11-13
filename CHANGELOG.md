@@ -18,6 +18,7 @@ All notable changes to this repository are listed here, newest first, in the for
 - The leak patterns allow GitHub's noreply address, which GitHub uses as the committer of merge and web-edit commits.
 - The leak patterns allow links to five more reviewed public hosts: files.pythonhosted.org and pypi.org, which a
   uv lockfile names, and pythonspeed.com, www.b-list.org and x.com, which the rules cite.
+- The leak patterns allow links to fastapi.tiangolo.com, which the application layout rule cites.
 - The Python guide adopts a new feature release from its first bugfix release, once that is 7 days old (rule 4.1).
 - §2.5: state assumptions before building, and ask first when a request can be read two ways.
 - §6.14: keep each pull request reviewable, one piece of work or one batch of related changes; about 100 changed lines is a good size and 1000 usually too large.
