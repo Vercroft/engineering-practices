@@ -13,6 +13,8 @@ All notable changes to this repository are listed here, newest first, in the for
 ### Changed
 
 - The leak patterns allow GitHub's noreply address, which GitHub uses as the committer of merge and web-edit commits.
+- The leak patterns allow links to five more reviewed public hosts: files.pythonhosted.org and pypi.org, which a
+  uv lockfile names, and pythonspeed.com, www.b-list.org and x.com, which the rules cite.
 
 ## [0.1.0] - 2026-11-08
 
