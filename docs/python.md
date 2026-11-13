@@ -17,10 +17,13 @@ Primary:
 - [DC] [dataclasses](https://docs.python.org/3/library/dataclasses.html) ([PEP 557](https://peps.python.org/pep-0557/))
 - [PUG] [Packaging User Guide: src layout vs flat layout](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/)
 - [PT] [pytest: Good Integration Practices](https://docs.pytest.org/en/stable/explanation/goodpractices.html) and
-  [import mechanisms](https://docs.pytest.org/en/stable/explanation/pythonpath.html)
+  [import mechanisms](https://docs.pytest.org/en/stable/explanation/pythonpath.html) (re-read 2026-11-13)
 - [RUFF] [ruff rules](https://docs.astral.sh/ruff/rules/), [settings](https://docs.astral.sh/ruff/settings/),
   [error suppression](https://docs.astral.sh/ruff/linter/#error-suppression); `ruff check --help` (0.17.0)
 - [MYPY] [mypy configuration](https://mypy.readthedocs.io/en/stable/config_file.html); `mypy --help` (2.4.0)
+- [MYPYMAP] [mypy: mapping file paths to modules](https://mypy.readthedocs.io/en/stable/running_mypy.html#mapping-file-paths-to-modules)
+  (2.4.1, read 2026-11-13)
+- [FAPI] [FastAPI: Bigger Applications](https://fastapi.tiangolo.com/tutorial/bigger-applications/) (read 2026-11-13)
 - [GSG] [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 - [LOG] [Logging HOWTO](https://docs.python.org/3/howto/logging.html)
 - [CF] [concurrent.futures](https://docs.python.org/3/library/concurrent.futures.html),
@@ -42,6 +45,8 @@ Practitioner evidence:
 - [PATH] discuss.python.org: [pathlib and os.path parity](https://discuss.python.org/t/pathlib-and-os-path-feature-parity-and-code-de-duplication/9239),
   [making paths absolute](https://discuss.python.org/t/making-paths-absolute-in-os-path-and-pathlib/43196)
 - [TC] pydevtools handbook, [How do Python type checkers compare?](https://pydevtools.com/handbook/explanation/how-do-mypy-pyright-and-ty-compare/) (2026)
+- [FBP] zhanymkanov/fastapi-best-practices, [Project Structure](https://github.com/zhanymkanov/fastapi-best-practices#project-structure)
+  (read 2026-11-13): grouping by file type "didn't scale well for our monolith with many domains and modules"
 
 Null results: r/Python could not be read (the site refused automated requests); no 2025-2026 discuss.python.org thread on src
 layout was found; neither ruff nor mypy requires a reason on a suppression comment (see
@@ -78,6 +83,45 @@ layout was found; neither ruff nor mypy requires a reason on a suppression comme
    `<product>-<component>` and the import package `<product>_<component>`, named by product, component and purpose
    (standard §3.5). Folders that are packages follow package names (enforced: `N`).
 5. A single-file script run directly (for example on a production host) needs no package; every other rule still applies.
+6. **Application layout: by feature** (standard §3.8). A feature with two or more modules gets its own folder;
+   one-module features, shared infrastructure and settings used by several features stay at the package root, and a
+   setting only one feature uses goes in that feature's folder. Each process is a thin entry module that only wires
+   the features together [FAPI]. Tests mirror the feature folders. Once `tests/` has subfolders, it and each
+   subfolder get an empty `__init__.py`: pytest's importlib mode accepts same-named test files in different folders
+   [PT], but mypy maps files to modules through `__init__.py` files [MYPYMAP] and without them stops with
+   `Duplicate module named "test_router"`. The `[tool.mypy]` block (rule 10) stays unchanged.
+
+   ```text
+   src/<package>/
+     __init__.py
+     web.py              # the web process: creates the app, includes each feature's router
+     worker.py           # the worker process: registers each feature's jobs
+     settings.py         # settings used by several features
+     database.py
+     models.py
+     migrations/
+     templates/          # server-rendered pages
+     static/
+     search.py           # a one-module feature stays a module
+     billing/
+       __init__.py
+       router.py
+       service.py
+     auth/
+       __init__.py
+       config.py         # a setting only auth uses
+       router.py
+       service.py
+   tests/
+     __init__.py         # empty, once tests/ has subfolders
+     test_search.py
+     billing/
+       __init__.py
+       test_router.py
+     auth/
+       __init__.py
+       test_router.py
+   ```
 
 ### 2. Imports, constants, globals and docstrings
 
@@ -190,7 +234,9 @@ per-file ignores it needs. It carries no internal names, so public repositories 
 Verified 2026-10-21 on a sample project with ruff 0.17.0, mypy 2.4.0, pytest 9.1.1 and uv 0.12.19: the block parses,
 mypy accepts every listed error code, pytest's strict mode refuses unknown options, and the banned APIs, `E402`,
 `E722`, `BLE001`, `S110`, `PTH`, `T201`, `UP` and `PLW0603` were each shown firing. Re-run the same day on CPython
-3.15.0 (uv 0.13.0): it passes.
+3.15.0 (uv 0.13.0): it passes. Mirrored test folders (rule 1.6) were checked on 2026-11-13 with pytest 9.2.0,
+mypy 2.4.1 and ruff 0.17.4 on CPython 3.15.2: without the test `__init__.py` files mypy stops with `Duplicate
+module named`; with them all three pass, with this block unchanged.
 
 ```toml
 [tool.ruff]
@@ -305,3 +351,6 @@ Disputed, and what we chose:
   on the line. We allow one code per line with a reason and maintainer approval ([suppressions.md](suppressions.md)).
 - **Cooldown length.** [COOL] finds 7 days blocks most attacks and 14 days all but one (xz-utils). We keep 7 days
   with the advisory exception.
+- **Folder per feature or per file type.** [FAPI]'s own example keeps every router in one `routers/` folder, which
+  is grouping by file type; [FBP] found that grouping "didn't scale well" for a monolith with many domains. We
+  group by feature (standard §3.8), starting flat.
