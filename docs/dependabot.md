@@ -27,6 +27,8 @@ Primary:
 - [UVD] [uv: using Dependabot](https://docs.astral.sh/uv/guides/integration/dependabot/)
 - [PNPM] [pnpm dependency-resolution settings](https://pnpm.io/settings/dependency-resolution)
 - [CARGO] [Cargo unstable features: `min-publish-age`](https://doc.rust-lang.org/cargo/reference/unstable.html)
+- [GOREL] [Go release history](https://go.dev/doc/devel/release) (read 2026-11-16): "Each major Go release is supported until there are two newer major releases."
+- [GOTIME] [Go modules reference](https://go.dev/ref/mod) (read 2026-11-16): a proxy's `.info` `Time` is the "commit time"
 - [TRB] [Troubleshooting Dependabot on GitHub Actions](https://docs.github.com/en/code-security/dependabot/troubleshooting-dependabot/troubleshooting-dependabot-on-github-actions)
 - [CMD] [Dependabot pull request comment commands](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-pull-request-comment-commands),
   [managing Dependabot PRs](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/managing-pull-requests-for-dependency-updates)
@@ -53,7 +55,8 @@ Practitioner evidence:
   (2026-02-26)
 
 Null results: GitHub's ecosystem table names no pnpm version above 10 and no uv version above 0.11, and no
-GitHub announcement of support for either was found; Cargo has no stable release-age setting. [OPT] does not say whether the
+GitHub announcement of support for either was found; Cargo has no stable release-age setting, and the go command has none
+(see [go.md](go.md)). [OPT] does not say whether gomod updates the `toolchain` line in `go.mod` (read 2026-11-16). [OPT] does not say whether the
 `ignore` option's `update-types` applies to Docker; it works there (see rule 15).
 
 ## Rules
@@ -94,7 +97,7 @@ GitHub announcement of support for either was found; Cargo has no stable release
      as Dependabot's uv advances, keep CI's exact pin and `--locked` (reproducible builds), and keep the pin inside the
      range.
    - Pins Dependabot does not read: tool versions inside `run:` lines, `.python-version` and `.node-version` files,
-     digests in scripts.
+     digests in scripts, and the `toolchain` line in `go.mod`.
    - Security fixes for Docker, Docker Compose and Bun: [ECO] lists no security updates for them.
 6. **Keep pnpm's own age check strict.** With `minimumReleaseAge` set, pnpm fails rather than install a too-new
    transitive version, so a Dependabot PR can fail CI until that version is 7 days old [CM]. That is the check working:
@@ -168,6 +171,7 @@ is the project's own rule, from its page (read 2026-10-26); check the page, not 
 | Dependabot name | Ignored | Support |
 |---|---|---|
 | `debian` | major | Each release gets five years: three of full support, then two of Long Term Support [DEB]. |
+| `golang` | major, minor | Each major Go release (1.N) is supported until there are two newer major releases [GOREL]. |
 | `node` | major | Even-numbered lines become Active LTS after six months as Current and odd-numbered lines are unsupported after six months; production uses Active or Maintenance LTS. From Node 27 every major reaches LTS, so read the schedule when a line is chosen [NODE]. |
 | `postgres` | major | Each major is supported for five years; minors are bug and security fixes only; a major upgrade needs a dump and reload or `pg_upgrade` [PGV]. |
 | `python` | major, minor | Each feature release (3.N) is supported for five years [PYV]. |
@@ -203,6 +207,7 @@ this section is the design they follow.
 | pnpm lockfile | `minimumReleaseAge` in `pnpm-workspace.yaml`; `pnpm install --frozen-lockfile --lockfile-only` | direct and transitive entries |
 | uv lockfile | `exclude-newer = "7 days"`; `uv lock --check` | never `uv sync --frozen` |
 | Actions, Cargo | Dependabot cooldown | Cargo has no stable release-age setting [CARGO] |
+| Go modules | Dependabot cooldown; the `Time` of each version the pull request adds (`go list -m -json`) | `Time` is the commit time [GOTIME]; rules in [go.md](go.md) |
 | Images | the image config's `created` date, below | no package manager checks it |
 
 - **One workflow, `dependency-age`,** holds these steps and nothing else, so a re-run repeats nothing but the age check.
@@ -226,6 +231,8 @@ this section is the design they follow.
     Only a deliberate edit does that; Dependabot's uv follows `pyproject.toml` [UVD].
   - GitHub Actions are covered only by the cooldown: a SHA bump made by hand, and pins inside
     `run:` lines, are unchecked. The same holds for Cargo.
+  - A Go module's `Time` is its commit time, set by its author (decision, 2026-11-16): it can be backdated, or predate
+    the release (the go1.27.4 toolchain module shows 2026-11-02 for a release made 2026-11-10).
   - An image's `created` time is set by its builder. It can be forged or predate the push, so the check guards against
     freshness, not malice. A reproducible-build image (1970) fails and needs an exception. `FROM ${VARIABLE}` is not
     resolved, and an image named by tag only in a compose or JSON file is not read (only digest pins are, there).
@@ -304,8 +311,25 @@ updates:
       default-days: 7
     open-pull-requests-limit: 1
 
+  # Go modules: the main module and tools/go.mod.
+  - package-ecosystem: gomod
+    directories: ["/", "/tools"]
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      gomod-minor-and-patch:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      gomod-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    open-pull-requests-limit: 3
+
   # A runtime, database or base image is a held image (rule 15): list its majors under `ignore`, in every
-  # docker and docker-compose entry that reads it. Python also ignores "version-update:semver-minor".
+  # docker and docker-compose entry that reads it. Python and golang also ignore "version-update:semver-minor".
   # GitHub offers no security updates for Docker, so there is no security group here (rule 5).
   - package-ecosystem: docker
     directory: /
@@ -322,6 +346,8 @@ updates:
       - dependency-name: node
         update-types: ["version-update:semver-major"]
       - dependency-name: python
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: golang
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
     open-pull-requests-limit: 3
 
@@ -342,7 +368,7 @@ updates:
     open-pull-requests-limit: 3
 ```
 
-Checked 2026-11-06 against the Dependabot schema with `check-jsonschema --builtin-schema vendor.dependabot` (0.39.0); the same file with `security-update` for `security-updates` fails it. Whether GitHub accepts each ecosystem is only shown by its first run in a repository.
+Checked 2026-11-06 against the Dependabot schema with `check-jsonschema --builtin-schema vendor.dependabot` (0.39.0); the same file with `security-update` for `security-updates` fails it. Checked again 2026-11-16 with the gomod entry and the `golang` ignore, with the same result. Whether GitHub accepts each ecosystem is only shown by its first run in a repository.
 
 ## Settled practice and where practitioners disagree
 

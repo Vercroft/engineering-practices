@@ -13,6 +13,9 @@ All notable changes to this repository are listed here, newest first, in the for
 - §3.6, measure before optimizing: a speed or memory change records before and after numbers from a measured baseline.
 - §3.7, production behaviour: timeouts, bounded retries with backoff, idempotent handling of repeated events, transactions, no swallowed failures.
 - §3.8, application layout: code grouped by feature, thin entry modules, tests mirror the feature folders.
+- A Go guide (docs/go.md), adopted by §3.2 as a choice, not a requirement: where Go fits, layout, toolchain pin,
+  scratch images, errors and logging, timeouts, contracts, one golangci-lint config, supply chain; Go lines in §7B.1,
+  §7B.12 and §7B.13, the Dependabot template and the suppression check script.
 
 ### Changed
 
@@ -20,6 +23,8 @@ All notable changes to this repository are listed here, newest first, in the for
 - The leak patterns allow links to five more reviewed public hosts: files.pythonhosted.org and pypi.org, which a
   uv lockfile names, and pythonspeed.com, www.b-list.org and x.com, which the rules cite.
 - The leak patterns allow links to fastapi.tiangolo.com, which the application layout rule cites.
+- The leak patterns allow links to go.dev, pkg.go.dev, golangci-lint.run, docs.sqlc.dev, openapi-ts.dev and osv.dev,
+  which the Go guide cites.
 - The Python guide adopts a new feature release from its first bugfix release, once that is 7 days old (rule 4.1).
 - §2.5: state assumptions before building, and ask first when a request can be read two ways.
 - §6.14: keep each pull request reviewable, one piece of work or one batch of related changes; about 100 changed lines is a good size and 1000 usually too large.
