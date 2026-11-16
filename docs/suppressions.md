@@ -1,7 +1,8 @@
 # Lint suppressions
 
-One policy for suppressing a lint or type-check finding in code, for Python, TypeScript/JavaScript and Rust, adopted
-by standard §3.2 and linked from [python.md](python.md), [frontend.md](frontend.md) and [rust.md](rust.md).
+One policy for suppressing a lint or type-check finding in code, for Python, TypeScript/JavaScript, Rust and Go,
+adopted by standard §3.2 and linked from [python.md](python.md), [frontend.md](frontend.md), [rust.md](rust.md) and
+[go.md](go.md).
 Researched 2026-10-21.
 
 ## Sources (read 2026-10-21)
@@ -18,6 +19,8 @@ Primary:
 - [TS] TypeScript 3.9: [`@ts-expect-error`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-9.html)
 - [REF] Rust reference: [lint attributes](https://doc.rust-lang.org/reference/attributes/diagnostics.html) (`expect`,
   `reason`); Clippy [lint list](https://clippy.rust-lang.org/master/index.html) (`allow_attributes`)
+- [GCI] golangci-lint: [false positives](https://golangci-lint.run/docs/linters/false-positives/) (`//nolint` forms)
+  and [nolintlint settings](https://golangci-lint.run/docs/linters/configuration/) (read 2026-11-16)
 
 Practitioner evidence:
 
@@ -58,11 +61,13 @@ whole categories of files, each with a reason (for example: tests assert, so `S1
 | Oxlint | `// oxlint-disable-next-line <rule> -- reason` | `--report-unused-disable-directives` [OXC] | as ESLint |
 | TypeScript | `// @ts-expect-error -- reason` | "Unused '@ts-expect-error' directive" [TS] | `@ts-ignore`, `@ts-nocheck` |
 | Rust | `#[expect(one_lint, reason = "...")]` | `unfulfilled_lint_expectations` [REF] | `#[allow]`, inner `#![allow]`/`#![expect]`, `cfg_attr(..., allow(...))`, several lints |
+| golangci-lint | `//nolint:<linter> // reason` at the end of a code line | nolintlint `allow-unused: false` [GCI] | bare `//nolint`, `//nolint:all`, several linters, `// nolint` with a space, the form at the start of a line (it covers the next block, or the file before `package` [GCI]), `//lint:ignore`, `//lint:file-ignore`, `#nosec` |
 
 Formatter ignores (`prettier-ignore`, `biome-ignore format`) name no rule, so they are refused; reformat the code
 instead. ruff and mypy accept the trailing `# reason` but do not require it; Biome requires a reason ("Reason is
-missing and can't be empty"); Clippy's `allow_attributes` does not check inner attributes [REF]. The script covers
-each gap.
+missing and can't be empty"); Clippy's `allow_attributes` does not check inner attributes [REF]; nolintlint's
+`require-explanation` accepts any text after `//` [GCI]. The script covers each gap, and skips Go files that carry the
+generated-code header (`// Code generated ... DO NOT EDIT.`), which are regenerated, never suppressed.
 
 ## Check script
 
@@ -80,13 +85,28 @@ found=$(mktemp)
 trap 'rm -f "$found"' EXIT
 
 git ls-files -z -- '*.py' '*.pyi' '*.ts' '*.tsx' '*.js' '*.jsx' '*.mjs' '*.cjs' '*.mts' '*.cts' \
-  '*.astro' '*.vue' '*.svelte' '*.rs' | xargs -0 -r perl -e '
+  '*.astro' '*.vue' '*.svelte' '*.rs' '*.go' | xargs -0 -r perl -e '
 my $bad = 0;
 my $why = qr/\S.{9,}/;    # the reason: 10 or more characters
 sub refuse { my ($p, $n, $c) = @_; warn "$p:$n: refused: $c\n"; $bad = 1 }
 for my $p (@ARGV) {
   open my $fh, "<", $p or die "$p: $!\n";
   my $text = do { local $/; <$fh> };
+  if ($p =~ /\.go$/) {
+    # Generated files carry the Go header and are regenerated, never suppressed by hand.
+    next if $text =~ m{^// Code generated .* DO NOT EDIT\.$}m;
+    my $n = 0;
+    for my $line (split /\n/, $text) {
+      $n++;
+      next unless $line =~ m{((?://\s*(?:nolint\b|lint:(?:file-)?ignore\b)|#nosec\b).*)$};
+      my $c = $1;
+      # Only at the end of a code line: at the start of a line it covers a block or the file.
+      if ($line =~ m{^\s*(?!//)\S.*?\s(//nolint:(?!all\b)[a-z0-9]+ // $why)$}) {
+        print "$p: $1\n";
+      } else { refuse($p, $n, $c) }
+    }
+    next;
+  }
   if ($p =~ /\.rs$/) {
     # Attributes may span lines (rustfmt splits long ones), so read the whole file.
     while ($text =~ /#(!?)\[((?:[^\]"]|"(?:[^"\\]|\\.)*")*)\]/g) {
@@ -128,7 +148,9 @@ fi
 ```
 
 Verified 2026-10-21 on the Python, TypeScript (Biome and Oxlint; ESLint) and Rust sample projects of the language
-pages. Passes: no suppressions with an empty listing; one specific suppression with a reason once listed, including a
+pages; the Go branch on 2026-11-16 on go.md's sample (a listed `//nolint:errcheck` passes and golangci-lint accepts
+it; each refused form in the table is reported; a generated file with a bare `//nolint` is skipped; the Python, Rust
+and TypeScript forms behave as before). Passes: no suppressions with an empty listing; one specific suppression with a reason once listed, including a
 JSX comment and a Rust `#[expect]` that rustfmt split over four lines. Fails: the same suppression unlisted; a second
 identical one in the same file; a changed reason; and every refused form in the table, each reported with its file
 and line. Each tool's stale check above was shown to fail on a stale suppression.
