@@ -63,7 +63,9 @@ and no per-test limit exists; index.golang.org cannot be queried by module; sqlc
 
 1. Fits: network services, HTTP APIs, background workers and command-line tools shipped as one static binary, where
    concurrency and low memory matter [FAQ], [LAY].
-2. Not: a product already in another language stays in it; data work, scripts and ML stay in Python
+2. A product already in another language may move a part to Go when Go is the right tool for that part (rule 1.1) and
+   a measurement shows the gain (standard §3.6), for example memory or CPU on the real server (decision, 2026-11-17).
+   Each move is a decision record (rule 4). Not Go: data work, scripts and ML stay in Python
    ([python.md](python.md)); browser code is TypeScript ([frontend.md](frontend.md)); code that needs no garbage
    collector or tight memory control is Rust ([rust.md](rust.md)) [FAQ].
 3. **Code that runs as root on a production host is never Go** (decision, 2026-11-16): it stays standard-library

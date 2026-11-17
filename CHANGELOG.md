@@ -36,6 +36,8 @@ All notable changes to this repository are listed here, newest first, in the for
 - §7C.6: gitleaks scans the staged changes at commit time and the full history on every pull request, from one shared
   reusable workflow; each repository adds rules for its own secret formats. Look at Betterleaks again when its v2 is
   stable.
+- The Go guide lets a product already in another language move a part to Go when Go is the right tool and a
+  measurement shows the gain; each move is a decision record (rule 1.2).
 - §0.8, §6.11 and §7F.2 state their reasons in full: why identifiers stay out of product repositories, the
   throwaway-repository guard for tests that run git, and why PolyForm Strict and not Noncommercial.
 - The Python guide shows a feature layout; mirrored test folders get an empty `__init__.py` so mypy strict accepts
