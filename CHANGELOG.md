@@ -21,6 +21,8 @@ All notable changes to this repository are listed here, newest first, in the for
 
 ### Changed
 
+- CI's `gitleaks` job runs the full-history scan from the organisation's shared workflow (pinned by commit SHA)
+  instead of its own copy; the check is now `gitleaks / gitleaks`.
 - The leak patterns allow GitHub's noreply address, which GitHub uses as the committer of merge and web-edit commits.
 - The leak patterns allow links to five more reviewed public hosts: files.pythonhosted.org and pypi.org, which a
   uv lockfile names, and pythonspeed.com, www.b-list.org and x.com, which the rules cite.
