@@ -16,6 +16,8 @@ All notable changes to this repository are listed here, newest first, in the for
 - A Go guide (docs/go.md), adopted by §3.2 as a choice, not a requirement: where Go fits, layout, toolchain pin,
   scratch images, errors and logging, timeouts, contracts, one golangci-lint config, supply chain; Go lines in §7B.1,
   §7B.12 and §7B.13, the Dependabot template and the suppression check script.
+- §7C.7, no paid GitHub feature by accident: paid add-ons stay off, metered products have a budget that stops usage,
+  paid features are checked before a transfer, and only the people GitHub lets manage billing change it.
 
 ### Changed
 
@@ -29,6 +31,13 @@ All notable changes to this repository are listed here, newest first, in the for
 - §2.5: state assumptions before building, and ask first when a request can be read two ways.
 - §6.14: keep each pull request reviewable, one piece of work or one batch of related changes; about 100 changed lines is a good size and 1000 usually too large.
 - §2.5: a report keeps apart what was verified, what is inferred and what is assumed.
+- §7C.1, §7C.2, §7B.10 and §7B.11: secret scanning, private vulnerability reporting, artifact attestations and attested
+  SBOMs are for public repositories only; a transfer with secret scanning on is billed for the month.
+- §7C.6: gitleaks scans the staged changes at commit time and the full history on every pull request, from one shared
+  reusable workflow; each repository adds rules for its own secret formats. Look at Betterleaks again when its v2 is
+  stable.
+- §0.8, §6.11 and §7F.2 state their reasons in full: why identifiers stay out of product repositories, the
+  throwaway-repository guard for tests that run git, and why PolyForm Strict and not Noncommercial.
 - The Python guide shows a feature layout; mirrored test folders get an empty `__init__.py` so mypy strict accepts
   same-named test files (rule 1.6).
 
