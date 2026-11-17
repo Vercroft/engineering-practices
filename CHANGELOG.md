@@ -21,6 +21,9 @@ All notable changes to this repository are listed here, newest first, in the for
 
 ### Changed
 
+- §0.7: a public repository may name a vendor where its own code, dependencies or deploy workflow use it, and its
+  privacy page names everyone who receives users' personal data and where; planning notes, research and issues still
+  do not.
 - §7C.6: until gitleaks' default rules catch GitHub's stateless installation tokens (`ghs_APPID_JWT`), every
   repository's `.gitleaks.toml` carries the rule `github-app-installation-token-stateless`, copied from this
   repository's `.gitleaks.toml`, which now has it.
