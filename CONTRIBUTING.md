@@ -6,8 +6,8 @@ repository follows are in [STANDARD.md](STANDARD.md); this file adds only what i
 ## Commands
 
 Set up once: `VENV="${TMPDIR:-/tmp}/ep-venv"; python3 -m venv "$VENV"`, and `pre-commit install`, whose hook runs the same
-gitleaks check with `.gitleaks.toml` as the `gitleaks / gitleaks` CI check, which also scans the full history. Each row
-below is what CI runs, in the job named in the last column.
+gitleaks check with `.gitleaks.toml` as the `Secret scan / Full history` CI check, which also scans the full history. Each
+row below is what CI runs, in the job named in the last column.
 
 | To | Run | CI job |
 |---|---|---|
