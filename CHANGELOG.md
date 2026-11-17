@@ -21,6 +21,9 @@ All notable changes to this repository are listed here, newest first, in the for
 
 ### Changed
 
+- §7C.6: until gitleaks' default rules catch GitHub's stateless installation tokens (`ghs_APPID_JWT`), every
+  repository's `.gitleaks.toml` carries the rule `github-app-installation-token-stateless`, copied from this
+  repository's `.gitleaks.toml`, which now has it.
 - CI's `gitleaks` job runs the full-history scan from the organisation's shared workflow (pinned by commit SHA)
   instead of its own copy; the check is now `gitleaks / gitleaks`.
 - The leak patterns allow GitHub's noreply address, which GitHub uses as the committer of merge and web-edit commits.
