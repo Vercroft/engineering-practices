@@ -366,7 +366,25 @@ updates:
         applies-to: security-updates
         patterns: ["*"]
     open-pull-requests-limit: 3
+
+  # The pinned remote hooks in .pre-commit-config.yaml (local hooks have no rev).
+  - package-ecosystem: pre-commit
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      pre-commit-minor-and-patch:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    open-pull-requests-limit: 3
 ```
+
+Dependabot lists `pre-commit` as an ecosystem, with cooldown `default-days` supported [ECO], [OPT], but whether it
+updates a hook pinned by commit SHA, with its tag comment, is unproven until its first pull request in a repository;
+until then the hook pins are checked by hand monthly.
 
 Checked 2026-11-06 against the Dependabot schema with `check-jsonschema --builtin-schema vendor.dependabot` (0.39.0); the same file with `security-update` for `security-updates` fails it. Checked again 2026-11-16 with the gomod entry and the `golang` ignore, with the same result. Whether GitHub accepts each ecosystem is only shown by its first run in a repository.
 
@@ -398,3 +416,4 @@ Disputed, and what we chose:
 | Date | Decision | Where |
 |---|---|---|
 | 2026-11-06 | Version updates monthly; minor and patch grouped per ecosystem; security updates grouped per ecosystem and immediate; a young security fix waits for the 7-day age; the 7-day rule is checked by tools (package-manager settings, Dependabot's cooldown, an image-age check) in a `dependency-age` workflow, with a daily re-run on Dependabot pull requests; an actively exploited vulnerability in a runtime, base image or OS is patched at once; a plain npm project moves to pnpm when its repository adopts this. | standard §7B.1, §7B.13, §7B.14; rules 1, 2, 4, 13 |
+| 2026-11-18 | The pinned remote pre-commit hooks get a monthly `pre-commit` entry with the 7-day cooldown; until its first pull request shows it keeps a SHA pin with its tag comment, the hook pins are checked by hand monthly. | standard §7B.1, §7C.6; template |
