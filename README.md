@@ -33,6 +33,7 @@ flowchart LR
 | [docs/suppressions.md](docs/suppressions.md) | When a lint suppression is allowed, and how it is listed and checked |
 | [docs/dependabot.md](docs/dependabot.md) | Monthly grouped Dependabot, the 7-day dependency age rule, the template |
 | [docs/documentation.md](docs/documentation.md) | How a repository documents itself: templates, sources, reasons |
+| [docs/required-checks.md](docs/required-checks.md) | The one required CI check: its job and its test |
 | [CHANGELOG.md](CHANGELOG.md) | What changed in each release |
 | [docs/decisions/](docs/decisions/) | One dated record per decision that moved into this repository |
 | [.github/](.github/) | The workflows that check this repository: licences, leaks, workflow audit, links, CodeQL, Scorecard |
