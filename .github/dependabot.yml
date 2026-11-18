@@ -17,7 +17,21 @@ updates:
         patterns: ["*"]
     open-pull-requests-limit: 3
 
-  # The hash-pinned CI tools (reuse, zizmor).
+  # The pinned remote hooks in .pre-commit-config.yaml (local hooks have no rev).
+  - package-ecosystem: pre-commit
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      pre-commit-minor-and-patch:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    open-pull-requests-limit: 3
+
+  # The hash-pinned CI tools (pre-commit, reuse, zizmor).
   - package-ecosystem: pip
     directory: /.github/requirements
     schedule:

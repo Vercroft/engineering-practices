@@ -7,8 +7,8 @@ path = ["**.md", "LICENSE", "REUSE.toml"]
 SPDX-FileCopyrightText = "2026 Vercroft contributors"
 SPDX-License-Identifier = "CC-BY-4.0"
 
-# Workflows and configuration: CI, Dependabot, the leak patterns, the hook and the suppression listing.
+# Workflows, configuration, scripts and tests: CI, Dependabot, the leak patterns, the hooks, the suppression listing.
 [[annotations]]
-path = [".github/**", ".gitleaks.toml", ".pre-commit-config.yaml", ".suppressions"]
+path = [".github/**", ".gitleaks.toml", ".pre-commit-config.yaml", ".suppressions", "scripts/**", "tests/**"]
 SPDX-FileCopyrightText = "2026 Vercroft contributors"
 SPDX-License-Identifier = "MIT"

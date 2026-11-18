@@ -9,6 +9,10 @@ All notable changes to this repository are listed here, newest first, in the for
 
 - §4.6, one required check for the CI workflow: a `Gate summary` job that needs every other job, with its job and
   its test in docs/required-checks.md.
+- §4.6, where a check lives: small checks are pre-commit hooks run by one `Repository checks` job; a matrix job,
+  its own job or its own workflow only when docs/required-checks.md's table says so.
+- This repository's CI follows it: one `Repository checks` job runs every hook, and a `Gate summary` job, with
+  its test in tests/, is the one required check for ci.yml.
 - §11.8, every line earns its place: exact commands early, "Never" boundaries, facts that break a default, a map
   of what names do not say, a test instead of prose; docs/documentation.md holds the evidence from three studies
   and a template for `docs/invariants.md`, which §11.7 names.
