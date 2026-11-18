@@ -3,7 +3,7 @@
 The templates, sources and reasons behind standard §11.7 and §11.8. The rules are in the standard; this page holds only
 what they point to. Researched 2026-11-06.
 
-## Sources (read in full 2026-11-06)
+## Sources (read in full 2026-11-06, unless an entry gives another date or extent)
 
 - [GHC] GitHub Docs, [Setting guidelines for repository contributors](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors):
   a `CONTRIBUTING.md` in the root, `docs` or `.github` is linked when someone opens an issue or pull request, shown as a
@@ -20,11 +20,29 @@ what they point to. Researched 2026-11-06.
   documents are never kept up to date. Small, modular documents have at least a chance at being updated."
 - [WTD] Write the Docs, [Docs as code](https://www.writethedocs.org/guide/docs-as-code/): documentation in version
   control, reviewed and tested like code, so that a change can be blocked when its documentation is missing.
+- [AGB] Matt Nigh, GitHub Blog, [How to write a great agents.md: Lessons from over 2,500 repositories](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/)
+  (2025-11-19; read in full 2026-11-18): "Put relevant executable commands in an early section"; "Include flags and
+  options, not just tool names"; "Set clear boundaries"; "One real code snippet showing your style beats three
+  paragraphs describing it."
+- [EVA] Gloaguen et al., [Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?](https://arxiv.org/abs/2602.11988)
+  (v3; abstract and §1 to §6 read 2026-11-18): "providing context files does not generally improve task
+  success rates", "increasing inference cost by over 20% on average"; such files "are useful for specifying
+  non-standard coding practices"; "repository overviews ... are not helpful"; "the length of context files has no
+  significant impact on our results" (§4.4); "developer-committed files outperform LLM-generated ones by a
+  significant margin of 7% on average" (§1).
+- [EFF] Lulla et al., [On the Impact of AGENTS.md Files on the Efficiency of AI Coding Agents](https://arxiv.org/abs/2601.20404)
+  (v2; read in full 2026-11-18): with the file, median wall-clock time fell 28.64% and median output tokens 16.58%
+  (Table 1); output quality "is beyond the scope of this paper".
+- [CTX] Khatri, [Do Context Files Help Coding Agents? A Two-Agent Ablation Study on Real Repositories](https://arxiv.org/abs/2607.27250)
+  (v1; abstract and §1 to §5.3 read 2026-11-18): "Context strategy does not measurably move correctness on either
+  agent"; a file warning that the full test suite is slow cut full-suite runs (§4.2, exploratory).
+- [AMD] [agents.md](https://agents.md/), the shared instruction file's own site (read 2026-11-18): "Agents
+  automatically read the nearest file in the directory tree".
 
 Null results and limits:
 - No study was found that measures how stale documentation misleads contributors who run the commands they find. The argument is plain: a wrong command costs a failed run, or worse.
-- The two numbers, "about 200 lines" for `CONTRIBUTING.md` and "one screen" for the README, are this standard's own choice, not
-  sourced.
+- The two numbers, "about 200 lines" for `CONTRIBUTING.md` and "one screen" for the README, are this standard's own
+  choice: no study sets a length (see "Why every line must earn its place").
 - Dated file names for decision records are our choice; [ADR] numbers records in sequence. A date orders
   records without a counter that two branches could both take.
 - The Diataxis tutorials page says tutorials take "a remarkable amount of effort and time" to write and keep true,
@@ -39,8 +57,18 @@ Null results and limits:
   instruction file to humans.
 - The standard keeps personal tool files out of repositories (§7E.3), so a person's own setup points at
   `CONTRIBUTING.md`.
+- Some automation accounts read one shared instruction file name on their own [AMD]. We still keep one file, so each
+  fact is stated once (§7E.3).
 - The cost: a contributor whose editor or automation account expects another file name must configure it to read
   `CONTRIBUTING.md`.
+
+## Why every line must earn its place
+
+These files are read and followed: their instructions "are well followed" [EVA], and they help most with
+"non-standard coding practices" [EVA] and facts such as a slow test suite [CTX]. Their effect on effort varies: less
+time and fewer output tokens in [EFF], more than 20% higher cost in [EVA]. No study found more correct work [EVA],
+[CTX]. Overviews are "not helpful", length has no significant impact, and files written by developers beat generated
+ones [EVA]. So each line must prevent a mistake, and the rest is cut (standard §11.8).
 
 ## Which kind of document is it
 
@@ -83,6 +111,7 @@ repository states the behaviour instead, standard §0.3>; this file adds only wh
 - Never edit by hand: `<generated files>`; regenerate with `<command>`.
 - Secrets never go in git: <where they live>.
 - Do not touch without the maintainers: `<paths>`.
+- <A fact that breaks a default, as a plain rule: for example, "The tests accept only a database named `<name>`.">
 
 ## Done means
 
@@ -124,3 +153,18 @@ Supersedes: [<title>](YYYY-MM-DD-title.md)   <!-- only if it does -->
 When a later record supersedes this one, only its status line changes, to
 `Status: superseded by [<title>](YYYY-MM-DD-title.md)`. Add a "Considered options" list only when the alternatives
 matter [ADR].
+
+## Template: `docs/invariants.md`
+
+A reference page for the rules the code must keep. `CONTRIBUTING.md`'s Boundaries links to it instead of copying them.
+
+````markdown
+# Invariants
+
+How the code must behave, one rule per line, with the test that enforces it. Loosening a rule is a reviewed decision.
+
+## <Area>
+
+- <The rule, as one plain sentence> (`<tests/path::test_name>`).
+- <A rule no test can check> (checked in review, standard §4.3).
+````

@@ -7,6 +7,11 @@ All notable changes to this repository are listed here, newest first, in the for
 
 ### Added
 
+- §4.6, one required check for the CI workflow: a `Gate summary` job that needs every other job, with its job and
+  its test in docs/required-checks.md.
+- §11.8, every line earns its place: exact commands early, "Never" boundaries, facts that break a default, a map
+  of what names do not say, a test instead of prose; docs/documentation.md holds the evidence from three studies
+  and a template for `docs/invariants.md`, which §11.7 names.
 - CI badge in the README.
 - FSL-1.1-MIT as a fourth code licence in §7F, for public products sold as a hosted service.
 - Two principles in §1: only what is required (7), which never cuts required work, and surgical changes (8).
@@ -21,6 +26,8 @@ All notable changes to this repository are listed here, newest first, in the for
 
 ### Changed
 
+- docs/suppressions.md: zizmor ignores (`# zizmor: ignore[<rule>]  # reason`) are listed and checked like other
+  suppressions; the check script reads every tracked `*.yml` and `*.yaml` file, so its sha256 changes.
 - §0.7: a public repository may name a vendor where its own code, dependencies or deploy workflow use it, and its
   privacy page names everyone who receives users' personal data and where; planning notes, research and issues still
   do not.

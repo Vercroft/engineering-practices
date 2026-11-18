@@ -1,6 +1,7 @@
 # Lint suppressions
 
-One policy for suppressing a lint or type-check finding in code, for Python, TypeScript/JavaScript, Rust and Go,
+One policy for suppressing a lint or type-check finding in code, for Python, TypeScript/JavaScript, Rust, Go and
+GitHub Actions workflows (zizmor),
 adopted by standard §3.2 and linked from [python.md](python.md), [frontend.md](frontend.md), [rust.md](rust.md) and
 [go.md](go.md).
 Researched 2026-10-21.
@@ -21,6 +22,8 @@ Primary:
   `reason`); Clippy [lint list](https://clippy.rust-lang.org/master/index.html) (`allow_attributes`)
 - [GCI] golangci-lint: [false positives](https://golangci-lint.run/docs/linters/false-positives/) (`//nolint` forms)
   and [nolintlint settings](https://golangci-lint.run/docs/linters/configuration/) (read 2026-11-16)
+- [ZIZ] zizmor: [ignoring results](https://docs.zizmor.sh/usage/#ignoring-results) (`# zizmor: ignore[rulename]`,
+  several rules comma-separated, "a trailing explanation"; read 2026-11-18)
 
 Practitioner evidence:
 
@@ -41,7 +44,8 @@ A suppression in code is allowed only when all four hold:
 1. **It names exactly one rule.** No blanket, file-level or range form.
 2. **It gives the reason on the same line**: why the rule does not apply here, not what the rule says, in at least 10
    characters [THAI].
-3. **It fails when it goes stale**, so a suppression cannot outlive its cause.
+3. **It fails when it goes stale**, so a suppression cannot outlive its cause. zizmor has no such check (table):
+   there, the line in `.suppressions` is the reminder to remove an ignore with its cause.
 4. **It is listed in `.suppressions`**, one committed file per repository: each suppression as `path: comment`,
    sorted, duplicates kept, no line numbers. CI regenerates the listing and fails on any difference, so a new,
    changed, swapped or duplicated suppression always changes `.suppressions` in the same pull request, where a
@@ -62,12 +66,15 @@ whole categories of files, each with a reason (for example: tests assert, so `S1
 | TypeScript | `// @ts-expect-error -- reason` | "Unused '@ts-expect-error' directive" [TS] | `@ts-ignore`, `@ts-nocheck` |
 | Rust | `#[expect(one_lint, reason = "...")]` | `unfulfilled_lint_expectations` [REF] | `#[allow]`, inner `#![allow]`/`#![expect]`, `cfg_attr(..., allow(...))`, several lints |
 | golangci-lint | `//nolint:<linter> // reason` at the end of a code line | nolintlint `allow-unused: false` [GCI] | bare `//nolint`, `//nolint:all`, several linters, `// nolint` with a space, the form at the start of a line (it covers the next block, or the file before `package` [GCI]), `//lint:ignore`, `//lint:file-ignore`, `#nosec` |
+| zizmor | `# zizmor: ignore[<rule>]  # reason` on a YAML comment in the finding's span | none: zizmor reports no unused ignore [ZIZ] | several rules (`ignore[a,b]`), no reason, a location ignore in `zizmor.yml` |
 
 Formatter ignores (`prettier-ignore`, `biome-ignore format`) name no rule, so they are refused; reformat the code
 instead. ruff and mypy accept the trailing `# reason` but do not require it; Biome requires a reason ("Reason is
 missing and can't be empty"); Clippy's `allow_attributes` does not check inner attributes [REF]; nolintlint's
 `require-explanation` accepts any text after `//` [GCI]. The script covers each gap, and skips Go files that carry the
-generated-code header (`// Code generated ... DO NOT EDIT.`), which are regenerated, never suppressed.
+generated-code header (`// Code generated ... DO NOT EDIT.`), which are regenerated, never suppressed. zizmor accepts any
+text after the rule; the script requires `  # reason`. It reads every tracked `*.yml` and `*.yaml` file, so workflows
+and composite actions are covered wherever they are, and it does not read `zizmor.yml`.
 
 ## Check script
 
@@ -85,7 +92,7 @@ found=$(mktemp)
 trap 'rm -f "$found"' EXIT
 
 git ls-files -z -- '*.py' '*.pyi' '*.ts' '*.tsx' '*.js' '*.jsx' '*.mjs' '*.cjs' '*.mts' '*.cts' \
-  '*.astro' '*.vue' '*.svelte' '*.rs' '*.go' | xargs -0 -r perl -e '
+  '*.astro' '*.vue' '*.svelte' '*.rs' '*.go' '*.yml' '*.yaml' | xargs -0 -r perl -e '
 my $bad = 0;
 my $why = qr/\S.{9,}/;    # the reason: 10 or more characters
 sub refuse { my ($p, $n, $c) = @_; warn "$p:$n: refused: $c\n"; $bad = 1 }
@@ -123,7 +130,13 @@ for my $p (@ARGV) {
   my $n = 0;
   for my $line (split /\n/, $text) {
     $n++;
-    if ($p =~ /\.pyi?$/) {
+    if ($p =~ /\.ya?ml$/) {
+      next unless $line =~ /(#\s*zizmor\s*:.*)$/;
+      my $c = $1;
+      if ($c =~ /^#\s*zizmor:\s*ignore\[[a-z0-9-]+\]\s+#\s+$why$/) {
+        print "$p: $c\n";
+      } else { refuse($p, $n, $c) }
+    } elsif ($p =~ /\.pyi?$/) {
       next unless $line =~ /(#\s*(?:noqa|ruff\s*:|type\s*:\s*ignore|mypy\s*:|pyright\s*:).*)$/;
       my $c = $1;
       if ($c =~ /^#\s*noqa:\s*[A-Z]+[0-9]+\s+#\s+$why$/ || $c =~ /^#\s*type:\s*ignore\[[a-z-]+\]\s+#\s+$why$/) {
@@ -153,7 +166,9 @@ it; each refused form in the table is reported; a generated file with a bare `//
 and TypeScript forms behave as before). Passes: no suppressions with an empty listing; one specific suppression with a reason once listed, including a
 JSX comment and a Rust `#[expect]` that rustfmt split over four lines. Fails: the same suppression unlisted; a second
 identical one in the same file; a changed reason; and every refused form in the table, each reported with its file
-and line. Each tool's stale check above was shown to fail on a stale suppression.
+and line. Each tool's stale check above was shown to fail on a stale suppression. The zizmor branch on 2026-11-18
+with zizmor 1.32.0: a listed `# zizmor: ignore[template-injection]  # reason` passes and zizmor honours it; the
+same line unlisted, without a reason, with two rules or with a reason under 10 characters fails.
 
 ## Settled practice and where practitioners disagree
 
