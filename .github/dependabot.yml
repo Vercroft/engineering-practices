@@ -31,7 +31,7 @@ updates:
         update-types: ["minor", "patch"]
     open-pull-requests-limit: 3
 
-  # The hash-pinned CI tools (reuse, zizmor).
+  # The hash-pinned CI tools (pre-commit, reuse, zizmor).
   - package-ecosystem: pip
     directory: /.github/requirements
     schedule:

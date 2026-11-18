@@ -5,28 +5,17 @@ repository follows are in [STANDARD.md](STANDARD.md); this file adds only what i
 
 ## Commands
 
-Set up once: `VENV="${TMPDIR:-/tmp}/ep-venv"; python3 -m venv "$VENV"`, and `pre-commit install`, whose hook runs the same
-gitleaks check with `.gitleaks.toml` as the `Secret scan / Full history` CI check, which also scans the full history. Each
-row below is what CI runs, in the job named in the last column.
+Set up once: `VENV="${TMPDIR:-/tmp}/ep-venv"; python3 -m venv "$VENV"`, then install the hash-pinned tools with
+`"$VENV/bin/pip" install --require-hashes --only-binary :all: -r .github/requirements/pre-commit.txt -r
+.github/requirements/reuse.txt -r .github/requirements/zizmor.txt` (reuse needs the system package `libmagic1t64`), and
+`"$VENV/bin/pre-commit" install`. At commit time the hook runs gitleaks with `.gitleaks.toml` and the suppression check;
+the `Secret scan / Full history` CI check scans the full history. Each row below is what CI runs, in the job named in
+the last column.
 
 | To | Run | CI job |
 |---|---|---|
-| Check the licences | install `reuse.txt` the same way (it needs the system package `libmagic1t64`), then `"$VENV/bin/reuse" lint` | REUSE lint |
-| Audit the workflows | install `zizmor.txt` the same way, then `"$VENV/bin/zizmor" --offline .github/workflows` | zizmor |
+| Run every hook: suppressions, zizmor, REUSE lint (gitleaks too, which CI skips) | `PATH="$VENV/bin:$PATH" pre-commit run --all-files --hook-stage manual` | Repository checks |
 | Check the links | `lychee --offline --no-progress './**/*.md'` | Local links |
-| Check the suppression listing | the commands in the block below | Suppressions are listed |
-
-The suppression listing (from the repository root; `git grep` exits 1 when nothing matches, which is fine here):
-
-```sh
-export LC_ALL=C
-found=$(mktemp)
-{
-  git grep -H -E '#[[:space:]]*(noqa|type:[[:space:]]*ignore)' -- '*.py' || true
-  git grep -H -E '#[[:space:]]*[z]izmor:[[:space:]]*ignore\[' -- '.github/workflows/*.yml' || true
-} | sed -E 's/^([^:]+):.*(#[[:space:]]*(noqa|type:|zizmor:).*)$/\1: \2/' | sort > "$found"
-diff -u .suppressions "$found"
-```
 
 ## Map
 
@@ -35,9 +24,9 @@ diff -u .suppressions "$found"
 | `STANDARD.md` | The numbered rules |
 | `docs/` | One guide per language or tool; `docs/decisions/` holds why a rule exists |
 | `.github/` | CI, link, CodeQL and Scorecard workflows; the Dependabot file |
-| `.github/requirements/` | Hash-pinned CI tools (reuse, zizmor) |
-| `.suppressions` | Every lint suppression, one line each |
-| `.gitleaks.toml`, `.pre-commit-config.yaml` | The leak patterns and the commit-time hook |
+| `.github/requirements/` | Hash-pinned CI tools (pre-commit, reuse, zizmor) |
+| `.suppressions`, `scripts/check-suppressions.sh` | Every lint suppression, one line each, and the check that lists them (a copy of docs/suppressions.md's script) |
+| `.gitleaks.toml`, `.pre-commit-config.yaml` | The leak patterns and the hooks |
 | `CHANGELOG.md` | One line per change, newest release first |
 | `LICENSE`, `LICENSES/`, `REUSE.toml` | Licence texts and the licence of every file |
 
@@ -48,8 +37,7 @@ diff -u .suppressions "$found"
   data. Public links go only to well-known documentation sites.
 - `.gitleaks.toml` holds patterns only, never the names of private things (standard §0.7).
 - A suppression (`# noqa`, `# type: ignore` or `# zizmor: ignore[rule]`, each with a reason) is listed in
-  `.suppressions` as `path: comment`, sorted; the `Suppressions are listed` job fails on any difference
-  (docs/suppressions.md).
+  `.suppressions` as `path: comment`, sorted; the `suppressions` hook fails on any difference (docs/suppressions.md).
 - CI tools are installed from `.github/requirements/*.txt` with `--require-hashes`. Regenerate one from its `.in` file
   with `uv pip compile --generate-hashes --universal --exclude-newer <date 7 days ago> --python-version 3.12 -o <tool>.txt
   <tool>.in`. Dependabot updates these files itself, through `pip-compile`, because each `.txt` has a matching `.in`.
@@ -63,7 +51,7 @@ diff -u .suppressions "$found"
 
 ## Done means
 
-- `reuse lint` is compliant and the CI jobs above pass.
+- Every hook passes (the first command above) and so do the CI checks.
 - Every document the change makes wrong is updated or deleted in the same pull request, and a changed decision has a
   new record in `docs/decisions/`.
 - A rule change cites its sources (standard §2).

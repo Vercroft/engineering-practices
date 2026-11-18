@@ -8,8 +8,9 @@ on:
 permissions: {}
 
 jobs:
-  licences:
-    name: REUSE lint
+  # Every hook in .pre-commit-config.yaml (docs/required-checks.md): suppressions, zizmor and REUSE lint.
+  repository-checks:
+    name: Repository checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -18,13 +19,22 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # Only runs the tools: pinned to a version every pinned package has a wheel for.
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14.10"
       - name: Install libmagic, which reuse needs and the runner image does not list
         run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libmagic1t64
-      - name: Lint
+      # gitleaks scans staged changes, and CI has none; the Secret scan check scans the full history.
+      - name: Run every hook
+        env:
+          SKIP: gitleaks
         run: |
-          python3 -m venv "$RUNNER_TEMP/venv"
-          "$RUNNER_TEMP/venv/bin/pip" install --quiet --require-hashes -r .github/requirements/reuse.txt
-          "$RUNNER_TEMP/venv/bin/reuse" lint
+          python -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --require-hashes --only-binary :all: \
+            -r .github/requirements/pre-commit.txt -r .github/requirements/reuse.txt -r .github/requirements/zizmor.txt
+          export PATH="$RUNNER_TEMP/venv/bin:$PATH"
+          pre-commit run --all-files --hook-stage manual --show-diff-on-failure
 
   # The full-history scan from the organisation's shared workflow (STANDARD.md 7C.6), with this
   # repository's .gitleaks.toml, on its default runner.
@@ -33,41 +43,3 @@ jobs:
     uses: Vercroft/.github/.github/workflows/reusable-secret-scan.yml@8eca96262002176019f5ff1d42bf651da8634806 # v2.0.0
     permissions:
       contents: read
-
-  workflows:
-    name: zizmor
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Audit the workflows
-        run: |
-          python3 -m venv "$RUNNER_TEMP/venv"
-          "$RUNNER_TEMP/venv/bin/pip" install --quiet --require-hashes -r .github/requirements/zizmor.txt
-          "$RUNNER_TEMP/venv/bin/zizmor" --offline .github/workflows
-
-  suppressions:
-    name: Suppressions are listed
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Compare the suppressions in the code with .suppressions
-        run: |
-          set -eu
-          export LC_ALL=C
-          found=$(mktemp)
-          # git grep exits 1 when nothing matches, which is a valid answer here.
-          {
-            git grep -H -E '#[[:space:]]*(noqa|type:[[:space:]]*ignore)' -- '*.py' || true
-            git grep -H -E '#[[:space:]]*[z]izmor:[[:space:]]*ignore\[' -- '.github/workflows/*.yml' || true
-          } | sed -E 's/^([^:]+):.*(#[[:space:]]*(noqa|type:|zizmor:).*)$/\1: \2/' | sort > "$found"
-          diff -u .suppressions "$found"
