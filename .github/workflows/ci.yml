@@ -8,7 +8,7 @@ on:
 permissions: {}
 
 jobs:
-  # Every hook in .pre-commit-config.yaml (docs/required-checks.md): suppressions, zizmor and REUSE lint.
+  # Runs every hook in .pre-commit-config.yaml (docs/required-checks.md); a new small check is a new hook there.
   repository-checks:
     name: Repository checks
     runs-on: ubuntu-latest
