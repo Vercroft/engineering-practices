@@ -18,6 +18,12 @@ repos:
         entry: sh scripts/check-suppressions.sh
         pass_filenames: false
         always_run: true
+      - id: gate-summary
+        name: Gate summary judges every CI job
+        language: unsupported
+        entry: python3 -B -m unittest discover -s tests
+        files: ^(\.github/workflows/ci\.yml|tests/)
+        pass_filenames: false
       # reuse and zizmor come from .github/requirements/*.txt (hash-pinned), not from their own hook repositories,
       # whose python hooks pre-commit would install without hashes.
       - id: zizmor

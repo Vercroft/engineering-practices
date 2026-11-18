@@ -14,7 +14,7 @@ the last column.
 
 | To | Run | CI job |
 |---|---|---|
-| Run every hook: suppressions, zizmor, REUSE lint (gitleaks too, which CI skips) | `PATH="$VENV/bin:$PATH" pre-commit run --all-files --hook-stage manual` | Repository checks |
+| Run every hook: suppressions, the gate test, zizmor, REUSE lint (gitleaks too, which CI skips) | `PATH="$VENV/bin:$PATH" pre-commit run --all-files --hook-stage manual` | Repository checks |
 | Check the links | `lychee --offline --no-progress './**/*.md'` | Local links |
 
 ## Map
@@ -25,6 +25,7 @@ the last column.
 | `docs/` | One guide per language or tool; `docs/decisions/` holds why a rule exists |
 | `.github/` | CI, link, CodeQL and Scorecard workflows; the Dependabot file |
 | `.github/requirements/` | Hash-pinned CI tools (pre-commit, reuse, zizmor) |
+| `tests/` | The gate test (standard library only): `python3 -B -m unittest discover -s tests` |
 | `.suppressions`, `scripts/check-suppressions.sh` | Every lint suppression, one line each, and the check that lists them (a copy of docs/suppressions.md's script) |
 | `.gitleaks.toml`, `.pre-commit-config.yaml` | The leak patterns and the hooks |
 | `CHANGELOG.md` | One line per change, newest release first |
