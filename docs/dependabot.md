@@ -17,6 +17,8 @@ Primary:
 - [DSU] [Dependabot security updates](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependabot-security-updates)
 - [CHG] [Dependabot version updates introduce default package cooldown](https://github.blog/changelog/2026-07-14-dependabot-version-updates-introduce-default-package-cooldown/)
   (2026-07-14): a 3-day default; we keep an explicit 7
+- [DBPNPM] [Dependabot now supports npm 12, pnpm 11 and 12, and Bun 1.4](https://github.blog/changelog/2026-10-20-dependabot-now-supports-npm-12-pnpm-11-and-12-and-bun-1-4/)
+  (2026-10-20, read 2026-11-19)
 - [UVS] [uv settings](https://docs.astral.sh/uv/reference/settings/): `exclude-newer`, `exclude-newer-package`
 - [IMG] [docker buildx imagetools inspect](https://docs.docker.com/reference/cli/docker/buildx/imagetools/inspect/) and the
   [OCI image configuration](https://github.com/opencontainers/image-spec/blob/main/config.md) (`created`: "the combined date and time at which the image was created")
@@ -45,6 +47,7 @@ Practitioner evidence:
 
 - [CM] Classmethod, [pnpm v11 minimumReleaseAge causes Dependabot CI failures](https://dev.classmethod.jp/en/articles/pnpm-11-minimum-release-age-dependabot-ci-failure/) (2026-07-11)
 - [DC] [dependabot-core #13405](https://github.com/dependabot/dependabot-core/issues/13405): read pnpm's `minimumReleaseAge` as a cooldown (open; author said on 2026-06-01 that work had not started)
+- [DC15904] [dependabot-core #15904](https://github.com/dependabot/dependabot-core/issues/15904): pnpm 12's two-document lockfile parsed as an empty dependency graph (closed as completed 2026-11-03, after GitHub fixed the dependency graph; read 2026-11-19)
 - [P11068] [pnpm #11068](https://github.com/pnpm/pnpm/issues/11068): transitive versions that break `minimumReleaseAge` (closed 2026-09-22)
 - [COOL] William Woodruff, [We should all be using dependency cooldowns](https://blog.yossarian.net/2025/11/21/We-should-all-be-using-dependency-cooldowns) (2025-11-21)
 - [BST] BoostSecurity, [Weaponizing Dependabot: Pwn Request at its Finest](https://labs.boostsecurity.io/articles/weaponizing-dependabot-pwn-request-at-its-finest/)
@@ -54,8 +57,8 @@ Practitioner evidence:
   [DevClass](https://www.devclass.com/security/2026/02/26/github-dependabot-is-a-noise-machine-and-should-be-turned-off-says-go-library-maintainer/4091858)
   (2026-02-26)
 
-Null results: GitHub's ecosystem table names no pnpm version above 10 and no uv version above 0.11, and no
-GitHub announcement of support for either was found; Cargo has no stable release-age setting, and the go command has none
+Null results: GitHub's ecosystem table names no uv version above 0.11, and no GitHub announcement of uv support
+was found; Cargo has no stable release-age setting, and the go command has none
 (see [go.md](go.md)). [OPT] does not say whether gomod updates the `toolchain` line in `go.mod` (read 2026-11-16). [OPT] does not say whether the
 `ignore` option's `update-types` applies to Docker; it works there (see rule 15).
 
@@ -86,11 +89,13 @@ GitHub announcement of support for either was found; Cargo has no stable release
    checks everything a pull request adds (section "The dependency-age workflow"). **Until a repository adopts that
    workflow, this rule and rule 13 stay in force as before:** before asking for approval, check that every
    new lockfile version is at least 7 days old, or is a recorded security exception that names the advisory.
-5. **A routine upgrade by hand covers only what Dependabot cannot:**
-   - pnpm 11 and 12 lockfiles: [ECO] lists pnpm "v7, v8, v9, v10". Practitioners report Dependabot PRs on pnpm 11
-     [CM]; try it, and hand a failing ecosystem to the by-hand routine. A plain npm project moves to pnpm when its
-     repository adopts the `dependency-age` workflow (decision, 2026-11-06), so its versions get pnpm's age check.
-   - uv: [ECO] lists "v0.11"; uv's docs say "some use cases ... are not yet working" [UVD]. Same approach. An exact
+5. **A routine upgrade by hand covers only what Dependabot cannot.** Dependabot covers pnpm 11 and 12 [DBPNPM],
+   including the two-document lockfile that pnpm 12 writes when `packageManager` is pinned: the dependency graph
+   reads it since 2026-11-03 [DC15904], so no workaround such as `pmOnFail: ignore` is needed, and a repository whose
+   alerts went missing before that date refreshes them once (Security, Dependabot alerts, the ⋯ menu, Refresh
+   Dependabot alerts). The routine covers:
+   - uv: [ECO] lists "v0.11"; uv's docs say "some use cases ... are not yet working" [UVD]. Try Dependabot first and
+     hand what fails to this routine. An exact
      `required-version = "==X"` in `[tool.uv]` stops Dependabot's own uv, which is newer than a pinned one
      (`tool_version_not_supported`). Practitioners fix it with a range and keep CI's exact pin. Write `required-version`
      as a range whose floor is no higher than the uv that a Dependabot run's log names and whose ceiling stays above it
