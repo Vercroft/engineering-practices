@@ -89,13 +89,13 @@ was found; Cargo has no stable release-age setting, and the go command has none
    checks everything a pull request adds (section "The dependency-age workflow"). **Until a repository adopts that
    workflow, this rule and rule 13 stay in force as before:** before asking for approval, check that every
    new lockfile version is at least 7 days old, or is a recorded security exception that names the advisory.
-5. **A routine upgrade by hand covers only what Dependabot cannot:**
-   - pnpm 11 and 12 lockfiles: Dependabot supports both [DBPNPM]. The two-document lockfile that pnpm 12 writes when
-     `packageManager` is pinned is read by the dependency graph since 2026-11-03 [DC15904], so no workaround such as
-     `pmOnFail: ignore` is needed. A repository whose alerts went missing before that date refreshes them once
-     (Security, Dependabot alerts, the ⋯ menu, Refresh Dependabot alerts). A plain npm project moves to pnpm when its
-     repository adopts the `dependency-age` workflow (decision, 2026-11-06), so its versions get pnpm's age check.
-   - uv: [ECO] lists "v0.11"; uv's docs say "some use cases ... are not yet working" [UVD]. Same approach. An exact
+5. **A routine upgrade by hand covers only what Dependabot cannot.** Dependabot covers pnpm 11 and 12 [DBPNPM],
+   including the two-document lockfile that pnpm 12 writes when `packageManager` is pinned: the dependency graph
+   reads it since 2026-11-03 [DC15904], so no workaround such as `pmOnFail: ignore` is needed, and a repository whose
+   alerts went missing before that date refreshes them once (Security, Dependabot alerts, the ⋯ menu, Refresh
+   Dependabot alerts). The routine covers:
+   - uv: [ECO] lists "v0.11"; uv's docs say "some use cases ... are not yet working" [UVD]. Try Dependabot first and
+     hand what fails to this routine. An exact
      `required-version = "==X"` in `[tool.uv]` stops Dependabot's own uv, which is newer than a pinned one
      (`tool_version_not_supported`). Practitioners fix it with a range and keep CI's exact pin. Write `required-version`
      as a range whose floor is no higher than the uv that a Dependabot run's log names and whose ceiling stays above it
