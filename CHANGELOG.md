@@ -25,6 +25,9 @@ All notable changes to this repository are listed here, newest first, in the for
 - A Go guide (docs/go.md), adopted by §3.2 as a choice, not a requirement: where Go fits, layout, toolchain pin,
   scratch images, errors and logging, timeouts, contracts, one golangci-lint config, supply chain; Go lines in §7B.1,
   §7B.12 and §7B.13, the Dependabot template and the suppression check script.
+- §3.2, which language does which job: Python, Go, Rust, TypeScript and shell, each with its source; the Go guide's
+  rule 1 links to it instead of restating it; the leak patterns allow links to docs.gitlab.com and www.rust-lang.org,
+  which it cites.
 - §7C.7, no paid GitHub feature by accident: paid add-ons stay off, metered products have a budget that stops usage,
   paid features are checked before a transfer, and only the people GitHub lets manage billing change it.
 

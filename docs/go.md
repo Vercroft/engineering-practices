@@ -1,9 +1,9 @@
 # Go standard
 
 The Go rules for every repository that adopts them, adopted by standard §3.2. Go is a choice, not a requirement
-(decision, 2026-11-16): rule 1 says where it fits. This page sets the shape before the first module (written
-2026-11-16). Short rules, each with its source; where a tool does not enforce a rule, it says so
-(standard §4.3).
+(decision, 2026-11-16): standard §3.2 says which jobs it fits, and rule 1 when a product moves a part to it. This page
+sets the shape before the first module (written 2026-11-16). Short rules, each with its source; where a tool does not
+enforce a rule, it says so (standard §4.3).
 
 ## Sources (read 2026-11-16)
 
@@ -61,13 +61,10 @@ and no per-test limit exists; index.golang.org cannot be queried by module; sqlc
 
 ### 1. When to use Go (decision, 2026-11-16)
 
-1. Fits: network services, HTTP APIs, background workers and command-line tools shipped as one static binary, where
-   concurrency and low memory matter [FAQ], [LAY].
-2. A product already in another language may move a part to Go when Go is the right tool for that part (rule 1.1) and
-   a measurement shows the gain (standard §3.6), for example memory or CPU on the real server (decision, 2026-11-17).
-   Each move is a decision record (rule 4). Not Go: data work, scripts and ML stay in Python
-   ([python.md](python.md)); browser code is TypeScript ([frontend.md](frontend.md)); code that needs no garbage
-   collector or tight memory control is Rust ([rust.md](rust.md)) [FAQ].
+1. Which jobs Go fits, and which belong to another language: standard §3.2 (decision, 2026-11-25).
+2. A product already in another language may move a part to Go when Go is the right tool for that part (standard
+   §3.2) and a measurement shows the gain (standard §3.6), for example memory or CPU on the real server (decision,
+   2026-11-17). Each move is a decision record (rule 4).
 3. **Code that runs as root on a production host is never Go** (decision, 2026-11-16): it stays standard-library
    Python on the system's own `python3` (python.md rule 8.2).
 4. A Go service in an existing product is a maintainers' decision with a record in `docs/decisions/`.
