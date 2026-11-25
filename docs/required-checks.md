@@ -19,7 +19,26 @@ The job and its test behind standard §4.6. Read 2026-11-18.
 - [PC] pre-commit, [docs](https://pre-commit.com/): in CI, "adding `pre-commit run --all-files` as a CI step";
   `fail_fast` "(optional: default `false`)"; `unsupported` is "_new in 4.4.0_: previously `language: system`"; the
   `manual` stage "will not be automatically triggered by any `git` hook"; "The `SKIP` environment variable is a comma
-  separated list of hook ids."
+  separated list of hook ids."; `default_install_hook_types` "(optional: default [pre-commit]) a list of --hook-types
+  which will be used by default when running pre-commit install"; commit-msg "hooks will be passed a single filename";
+  pre-push sets `PRE_COMMIT_TO_REF`, "the local revision that is being pushed to the remote" (read 2026-11-25).
+- [PCSRC] pre-commit 4.7.0, [`hook_impl.py`](https://github.com/pre-commit/pre-commit/blob/v4.7.0/pre_commit/commands/hook_impl.py)
+  (read 2026-11-25): `_pre_push_ns` returns at the first pushed ref with new commits, so later refs of the same push are
+  not checked; when the push includes the root commit it sets `all_files=True` and no `to_ref`.
+- [GL] gitleaks v8.30.1, [README](https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md#git) and
+  [`sources/git.go`](https://github.com/gitleaks/gitleaks/blob/v8.30.1/sources/git.go) (read 2026-11-25): "You can
+  configure the behavior of `git log -p` with the `log-opts` option"; the flag is `--log-opts string   git log
+  options`; without it gitleaks runs `git log -p -U0 --full-history --all --diff-filter=tuxdb`, with it
+  `git log -p -U0` followed by the given options.
+- [GITH] Git, [githooks](https://git-scm.com/docs/githooks) (read 2026-11-25): pre-push "can be used to prevent a push
+  from taking place"; "If this hook exits with a non-zero status, git push will abort without pushing anything";
+  `commit-msg` "can be bypassed with the --no-verify option", and `git push` takes `--no-verify` too.
+- [DEV] Camille Hodoul, [Pre-commit, pre-push or pre-merge ?](https://dev.to/camillehdl/pre-commit-pre-push-or-pre-merge-8i9)
+  (read 2026-11-25), practitioner: "The slower the task, the later and less often it should run"; pre-push for "less
+  than 10 seconds", pre-merge (CI) above.
+- [TW] Thoughtworks, [Pre-commit: Don’t git hooked!](https://www.thoughtworks.com/en-au/insights/blog/pre-commit-don-t-git-hooked)
+  (read 2026-11-25), practitioner: "when developers feel impeded, they will find a workaround"; "you could just
+  bypass the hooks altogether with --no-verify".
 
 ## Where a check lives
 
@@ -158,3 +177,67 @@ A test in the repository's own language reads the CI workflow and fails when:
    condition counts as passed.
 
 Example: [Burnbird's test](https://github.com/Vercroft/burnbird/blob/f0e1f3c89a2bd216d0c5ecc0433e8dde009c6313/tests/test_gate_summary.py).
+
+## A repository without CI
+
+Standard §4.6, read 2026-11-25. A repository with no runner runs every check its CI would run as git hooks, installed
+by one `pre-commit install`. When the pre-push hook fails, "git push will abort without pushing anything" [GITH]. It
+is weaker than CI: it runs on the contributor's machine, and `git push --no-verify` skips it [GITH], [TW].
+
+- Every check CI would run runs at `pre-push`, in a clean copy of the pushed commit (a detached `git worktree`,
+  standard §6.11), so a fix left uncommitted cannot make a failing commit pass. One `pushed-commit` hook runs every
+  `manual`-stage hook there; CI's "Run every hook" step is the same command.
+- A check that reads the commit message (dashes, standard §6.9; identities and trailers, §6.8) runs at `commit-msg`,
+  whose hook "will be passed a single filename" holding the message [PC].
+- `default_install_hook_types` makes `pre-commit install` install all three hook types [PC]; `default_stages` keeps
+  every other hook off `pre-push`, where it would read the working tree.
+- The full-history secret scan of standard §7C.6 is gitleaks' own hook a second time, at the `manual` stage, with its
+  entry changed to scan the full history of the pushed commit, like CI's scan of a pull request's history:
+  `--log-opts=HEAD`, because the clean copy is detached at that commit; without it gitleaks scans every local branch
+  [GL]. Both gitleaks hooks take the repository's `--config=.gitleaks.toml`, as above.
+- pre-commit checks only the first branch of a push that sends new commits [PCSRC], so push one branch at a time.
+- `CONTRIBUTING.md` says the repository has no CI and that these hooks stand in for it.
+- A scheduled check (the weekly external link check of standard §11.8) is a scheduled workflow, or a `manual` hook a
+  maintainer runs on that schedule, recorded as an exception in `docs/decisions/`. The maintainers choose.
+
+No primary source sets this rule. Practitioners place a check by how long it takes, pre-push for "less than 10
+seconds" and CI for the rest [DEV], and warn that slow hooks get skipped [TW]; here the pre-push hook is the only gate.
+
+```yaml
+minimum_pre_commit_version: "4.4.0"
+default_install_hook_types: [pre-commit, pre-push, commit-msg]
+default_stages: [pre-commit, manual]
+default_language_version:
+  golang: 1.27.3
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e  # v8.30.1
+    hooks:
+      - id: gitleaks
+        args: [--config=.gitleaks.toml]
+      - id: gitleaks
+        alias: gitleaks-history
+        name: Secret scan of the full history
+        entry: gitleaks git --redact --verbose --log-opts=HEAD
+        args: [--config=.gitleaks.toml]
+        stages: [manual]
+  - repo: local
+    hooks:
+      - id: dashes
+        name: No em or en dashes
+        language: pygrep
+        entry: '\xe2\x80[\x93\x94]'
+        stages: [pre-commit, commit-msg, manual]
+      # A push that includes the root commit gets no PRE_COMMIT_TO_REF [PCSRC], so the pushed branch is used.
+      - id: pushed-commit
+        name: Every check, on a clean copy of the pushed commit
+        language: unsupported
+        entry: >-
+          sh -c 'set -eu; dir=$(mktemp -d);
+          trap "git worktree remove --force \"$dir\"" EXIT;
+          git worktree add --quiet --detach "$dir" "${PRE_COMMIT_TO_REF:-$PRE_COMMIT_LOCAL_BRANCH}";
+          cd "$dir"; pre-commit run --all-files --hook-stage manual'
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
+```
