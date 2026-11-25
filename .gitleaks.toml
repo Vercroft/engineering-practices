@@ -71,6 +71,9 @@ regexes = ['''(?i)^(?:adr\.github\.io|agents\.md|arxiv\.org|bford\.info|biomejs\
 [[rules.allowlists]]
 description = "reviewed public hosts cited by docs/required-checks.md"
 regexes = ['''(?i)^(?:dev\.to|www\.thoughtworks\.com)$''']
+[[rules.allowlists]]
+description = "reviewed public host cited by standard §6.14"
+regexes = ['''(?i)^smartbear\.com$''']
 
 # GitHub App installation tokens in the stateless ghs_APPID_JWT form (https://github.blog/changelog/2026-10-02-stateless-github-app-installation-tokens-rolled-out/), which the default github-app-token rule misses.
 [[rules]]

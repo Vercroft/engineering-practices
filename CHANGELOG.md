@@ -7,6 +7,7 @@ All notable changes to this repository are listed here, newest first, in the for
 
 ### Added
 
+- §6.14, size each commit and count only lines that need review: a commit is one logical change, ideally under about 400 such lines (from the source); a pull request about 1000, or up to 2000 in a single-maintainer repository (this standard's own decisions); lock files, generated files and moved lines are not counted.
 - §4.6, a repository without CI: every check its CI would run is a git hook, at pre-push on a clean copy of the
   pushed commit and at commit-msg for the message, with a tested configuration in docs/required-checks.md; §6.11,
   §7C.6 and §11.8 link to it; the leak patterns allow links to dev.to and www.thoughtworks.com, which it cites.
