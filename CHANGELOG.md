@@ -30,6 +30,8 @@ All notable changes to this repository are listed here, newest first, in the for
 
 ### Changed
 
+- docs/documentation.md: the decision record template has an optional `Decided by:` line, for where more than one
+  person can decide or who decided matters later.
 - docs/suppressions.md: zizmor ignores (`# zizmor: ignore[<rule>]  # reason`) are listed and checked like other
   suppressions; the check script reads every tracked `*.yml` and `*.yaml` file, so its sha256 changes.
 - §11.6: a repository that ships nothing (rules, plans or data) shows a diagram of its main structure in its README
