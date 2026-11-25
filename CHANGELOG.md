@@ -7,6 +7,9 @@ All notable changes to this repository are listed here, newest first, in the for
 
 ### Added
 
+- §4.6, a repository without CI: every check its CI would run is a git hook, at pre-push on a clean copy of the
+  pushed commit and at commit-msg for the message, with a tested configuration in docs/required-checks.md; §6.11,
+  §7C.6 and §11.8 link to it; the leak patterns allow links to dev.to and www.thoughtworks.com, which it cites.
 - §4.6, one required check for the CI workflow: a `Gate summary` job that needs every other job, with its job and
   its test in docs/required-checks.md.
 - §4.6, where a check lives: small checks are pre-commit hooks run by one `Repository checks` job; a matrix job,
