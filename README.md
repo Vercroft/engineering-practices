@@ -29,7 +29,7 @@ flowchart LR
 | [docs/python.md](docs/python.md) | Python: layout, typing, errors, dependencies, one ruff, mypy, pytest and uv block |
 | [docs/frontend.md](docs/frontend.md) | TypeScript and JavaScript: Biome by default, strict `tsc`, pnpm settings |
 | [docs/rust.md](docs/rust.md) | Rust: workspace, toolchain, lints, cargo-deny, nextest |
-| [docs/go.md](docs/go.md) | Go: when it fits, layout, toolchain pin, scratch images, errors, timeouts, contracts, one golangci-lint config, govulncheck |
+| [docs/go.md](docs/go.md) | Go: when a part moves to Go, layout, toolchain pin, scratch images, errors, timeouts, contracts, one golangci-lint config, govulncheck |
 | [docs/suppressions.md](docs/suppressions.md) | When a lint suppression is allowed, and how it is listed and checked |
 | [docs/dependabot.md](docs/dependabot.md) | Monthly grouped Dependabot, the 7-day dependency age rule, the template |
 | [docs/documentation.md](docs/documentation.md) | How a repository documents itself: templates, sources, reasons |

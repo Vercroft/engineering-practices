@@ -7,6 +7,9 @@ All notable changes to this repository are listed here, newest first, in the for
 
 ### Added
 
+- §4.6, a repository without CI: every check its CI would run is a git hook, at pre-push on a clean copy of the
+  pushed commit and at commit-msg for the message, with a tested configuration in docs/required-checks.md; §6.11,
+  §7C.6 and §11.8 link to it; the leak patterns allow links to dev.to and www.thoughtworks.com, which it cites.
 - §4.6, one required check for the CI workflow: a `Gate summary` job that needs every other job, with its job and
   its test in docs/required-checks.md.
 - §4.6, where a check lives: small checks are pre-commit hooks run by one `Repository checks` job; a matrix job,
@@ -25,13 +28,20 @@ All notable changes to this repository are listed here, newest first, in the for
 - A Go guide (docs/go.md), adopted by §3.2 as a choice, not a requirement: where Go fits, layout, toolchain pin,
   scratch images, errors and logging, timeouts, contracts, one golangci-lint config, supply chain; Go lines in §7B.1,
   §7B.12 and §7B.13, the Dependabot template and the suppression check script.
+- §3.2, which language does which job: Python, Go, Rust, TypeScript and shell, each with its source; the Go guide's
+  rule 1 links to it instead of restating it; the leak patterns allow links to docs.gitlab.com and www.rust-lang.org,
+  which it cites.
 - §7C.7, no paid GitHub feature by accident: paid add-ons stay off, metered products have a budget that stops usage,
   paid features are checked before a transfer, and only the people GitHub lets manage billing change it.
 
 ### Changed
 
+- docs/documentation.md: the decision record template has an optional `Decided by:` line, for where more than one
+  person can decide or who decided matters later.
 - docs/suppressions.md: zizmor ignores (`# zizmor: ignore[<rule>]  # reason`) are listed and checked like other
   suppressions; the check script reads every tracked `*.yml` and `*.yaml` file, so its sha256 changes.
+- §11.6: a repository that ships nothing (rules, plans or data) shows a diagram of its main structure in its README
+  instead of how a change ships; the leak patterns allow links to matklad.github.io, which it cites.
 - §0.7: a public repository may name a vendor where its own code, dependencies or deploy workflow use it, and its
   privacy page names everyone who receives users' personal data and where; planning notes, research and issues still
   do not.

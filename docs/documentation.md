@@ -17,7 +17,10 @@ what they point to. Researched 2026-11-06.
 - [ADR] Michael Nygard, [Documenting Architecture Decisions](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions)
   (2011), the [ADR site](https://adr.github.io/) and [MADR](https://adr.github.io/madr/): one short record per decision
   with title, context, decision, status and consequences; a reversed decision is kept and marked superseded; "Large
-  documents are never kept up to date. Small, modular documents have at least a chance at being updated."
+  documents are never kept up to date. Small, modular documents have at least a chance at being updated." MADR's
+  template (read 2026-11-25) lists optional metadata, among it "decision-makers: {list everyone involved in the
+  decision}", and the [ADR templates](https://adr.github.io/adr-templates/) page says MADR "suggests metadata such as
+  decision makers and confirmation in addition to decision status".
 - [WTD] Write the Docs, [Docs as code](https://www.writethedocs.org/guide/docs-as-code/): documentation in version
   control, reviewed and tested like code, so that a change can be blocked when its documentation is missing.
 - [AGB] Matt Nigh, GitHub Blog, [How to write a great agents.md: Lessons from over 2,500 repositories](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/)
@@ -135,6 +138,7 @@ repository states the behaviour instead, standard §0.3>; this file adds only wh
 
 Date: YYYY-MM-DD
 Status: accepted
+Decided by: <who>   <!-- optional: see below -->
 Supersedes: [<title>](YYYY-MM-DD-title.md)   <!-- only if it does -->
 
 ## Context
@@ -150,6 +154,7 @@ Supersedes: [<title>](YYYY-MM-DD-title.md)   <!-- only if it does -->
 <What changes afterwards, good, bad and neutral, including what it costs.>
 ````
 
+Add the `Decided by:` line only where more than one person can decide, or where who decided will matter later [ADR].
 When a later record supersedes this one, only its status line changes, to
 `Status: superseded by [<title>](YYYY-MM-DD-title.md)`. Add a "Considered options" list only when the alternatives
 matter [ADR].
