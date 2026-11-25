@@ -32,6 +32,8 @@ All notable changes to this repository are listed here, newest first, in the for
 
 - docs/suppressions.md: zizmor ignores (`# zizmor: ignore[<rule>]  # reason`) are listed and checked like other
   suppressions; the check script reads every tracked `*.yml` and `*.yaml` file, so its sha256 changes.
+- §11.6: a repository that ships nothing (rules, plans or data) shows a diagram of its main structure in its README
+  instead of how a change ships; the leak patterns allow links to matklad.github.io, which it cites.
 - §0.7: a public repository may name a vendor where its own code, dependencies or deploy workflow use it, and its
   privacy page names everyone who receives users' personal data and where; planning notes, research and issues still
   do not.

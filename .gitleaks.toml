@@ -57,6 +57,9 @@ description = "link to a host that is not reviewed as public"
 regex = '''(?i)\bhttps?://([a-z0-9][a-z0-9.-]*)'''
 secretGroup = 1
 [[rules.allowlists]]
+description = "reviewed public host cited by standard §11.6"
+regexes = ['''(?i)^matklad\.github\.io$''']
+[[rules.allowlists]]
 description = "placeholder hosts"
 regexes = ['''(?i)^(?:localhost|(?:[a-z0-9-]+\.)*example(?:\.(?:com|org|net))?|[a-z0-9.-]*\.(?:invalid|test))$''']
 [[rules.allowlists]]

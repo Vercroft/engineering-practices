@@ -219,16 +219,16 @@ unrelated work, and merged as §6.3 says.
    - The pull request description has a **"Docs updated"** section: every document changed, or "none needed" with one line why.
 4. Issues are triaged weekly: fixed ones closed with proof, duplicates merged, the rest grouped by priority.
 5. Public repository documentation must obey §0 (no private names, no internal rule IDs, no personal data).
-6. **Every repository's README has the same shape, and fits one screen (decision, 2026-11-05; one screen, 2026-11-06).** In this order, each part only where it is real:
+6. **Every repository's README has the same shape, and fits one screen (decision, 2026-11-05; one screen, 2026-11-06; a repository that ships nothing, 2026-11-25).** In this order, each part only where it is real:
    1. a screenshot or banner (a light and a dark version in a `<picture>` element if the project has both themes);
    2. a one-line description and the live link;
    3. only real badges: CI, deploy and OpenSSF Scorecard (§7B.9);
-   4. a Mermaid diagram of how a change ships, without naming the hosting product (§0.7);
+   4. a Mermaid diagram of how a change ships, without naming the hosting product (§0.7); a repository that ships nothing (rules, plans or data) shows a diagram of its main structure instead: its main parts and how they relate;
    5. a quick start that runs the project (install, tests, lint and the git hooks are in `CONTRIBUTING.md`);
    6. links to `CONTRIBUTING.md` and the docs;
    7. the license (§7F).
 
-   Sources: GitHub Docs on [Mermaid diagrams](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams) (a `mermaid` code block renders as a diagram), on the [`<picture>` element](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) ("The `<picture>` HTML element is supported") and on [alerts](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) (`> [!NOTE]` and its siblings, for the few points a reader must not miss).
+   Sources: GitHub Docs on [Mermaid diagrams](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams) (a `mermaid` code block renders as a diagram), on the [`<picture>` element](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) ("The `<picture>` HTML element is supported") and on [alerts](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) (`> [!NOTE]` and its siblings, for the few points a reader must not miss). The structure diagram follows matklad's [ARCHITECTURE.md](https://matklad.github.io/2021/02/06/ARCHITECTURE.md.html): "Start with a bird’s eye overview of the problem being solved", then "Describe coarse-grained modules and how they relate to each other."
 
 7. **A repository documents itself in these files and no others (decision, 2026-11-06)**, so the next person understands it quickly. Templates, sources and reasons: [docs/documentation.md](docs/documentation.md).
    - `README.md`, for humans: what the project is, how to run it, links (shape: item 6).
